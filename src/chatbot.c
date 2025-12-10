@@ -1,6 +1,7 @@
 #include "chatbot.h"
 #include "user.h"
 #include "llm.h"
+#include "game.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,12 +11,13 @@ static LLMModel g_llm_model;
 
 // 私有声明
 static void chatbot_auth_loop(Chatbot *bot);
+
 static void dispatch_intent(Chatbot *bot, Intent intent, char *resp);
 
 // 初始化
 int chatbot_init(Chatbot *bot) {
     if (!bot) return 0;
-    
+
     printf("[System] 正在加载模块...\n");
     if (!user_init()) {
         printf("[Error] 用户模块加载失败\n");
@@ -122,28 +124,24 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
 
         // --- 游戏模块 ---
         case INTENT_GAME_START:
-            if (strstr(param, "snake") || strstr(param, "贪吃蛇")) {
-                sprintf(resp, "[GAME] 启动贪吃蛇...");
-                // game_snake();
-            } else {
-                sprintf(resp, "[GAME] 游戏菜单: %s (未实现)", param);
-            }
+            play_games();
+            printf("感谢游玩，下次再来哦！\n");
             break;
 
         // --- 闲聊与系统 ---
         case INTENT_CHAT:
-        default: {
+        default:
             char *chat = llm_chat_generate(&g_llm_model, param);
             if (chat) {
-                strncpy(resp, chat, MAX_RESPONSE-1);
+                strncpy(resp, chat, MAX_RESPONSE - 1);
                 free(chat);
             } else {
                 strcpy(resp, "AI 连接超时，请检查 llamafile。");
             }
             break;
-        }
     }
 }
+
 
 static void chatbot_auth_loop(Chatbot *bot) {
     // 简单模拟直接登录，方便调试
