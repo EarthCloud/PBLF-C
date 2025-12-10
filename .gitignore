@@ -1,0 +1,4 @@
+tools/
+cmake-build-debug/
+*.o
+*.exe

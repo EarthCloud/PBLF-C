@@ -1,0 +1,20 @@
+定义枚举和用途
+
+INTENT_UNKNOWN,    未知模式
+
+INTENT_TODO_ADD,    添加待办事项
+INTENT_TODO_LIST,   列出目前有的待办，支持关键词搜索
+INTENT_TODO_COMPLETE,   完成了这个待办，参数为待办索引
+INTENT_TODO_DELETE,     删除这个待办，参数为待办索引
+
+INTENT_MEMO_LIST,   列出备忘录，支持标题搜索
+INTENT_MEMO_ADD,   新建备忘录，参数为标题
+INTENT_MEMO_READ,  读取备忘录，参数为标题
+INTENT_MEMO_DELETE,  删除备忘录，参数为标题
+
+INTENT_CONTACT_LIST,   列出联系人，支持人名搜索
+INTENT_CONTACT_ADD,   新建联系人，参数为人名
+INTENT_CONTACT_DELETE,  删除联系人，参数为人名
+
+INTENT_GAME_START,      启动游戏选单
+INTENT_CHAT,    单纯聊天，参数为聊天的原话
