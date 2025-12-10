@@ -17,6 +17,7 @@ set(SOURCES
         src/user.c
         src/llm.c
         src/http.c
+        src/game.c
 )
 
 # 3. 生成可执行文件 (CMake 会自动根据系统在 Windows 下生成 chatbot.exe，Linux 下生成 chatbot)

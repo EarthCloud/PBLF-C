@@ -2,3 +2,4 @@ tools/
 cmake-build-debug/
 *.o
 *.exe
+temp_debug.bat
