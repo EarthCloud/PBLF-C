@@ -19,17 +19,13 @@ void play_games(){
     printf("欢迎来到游戏合集！请选择您想玩的游戏：\n");
     printf("1. 贪吃蛇游戏\n");
     printf("2. 数独游戏\n");
-    printf("3. 计算器\n");
-    printf("请输入游戏编号（1-3）：");
+    printf("请输入游戏编号（1-2）：");
     scanf("%d", &a);
     if (a == 1){
         game_snake();
     }
     else if (a == 2){
         game_sudoku();
-    }
-    else if (a == 3){
-        calculator();
     }
     else{
         printf("无效的选择，请重新运行程序并选择正确的游戏编号。\n");
@@ -135,7 +131,7 @@ void game_sudoku() {
     } else {
         printf("\n无解。\n");
     }
-
+    Sleep(10000);
 }
 void initStack(Stack *stack) {
     stack->top = -1;
@@ -502,12 +498,14 @@ void game_snake() {
         draw_snake(&snake);
 
         gotoxy(0, HEIGHT + 1);
-        printf("Score: %d   [WASD/方向键控制, ESC退出]", score);
+
 
         Sleep(100); // 控制速度
     }
     gotoxy(0, HEIGHT + 2);
-    system("pause");
+    printf("Score: %d   [WASD/方向键控制, ESC退出]", score);
+    Sleep(2000);
+    system("cls");
 }
 
     

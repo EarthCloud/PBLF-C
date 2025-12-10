@@ -34,11 +34,11 @@ char *http_post_json(const char *hostname, int port, const char *endpoint, const
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET) return NULL;
 
-    // 通过地址创建主机
     /*
-        hostent 结构体用于表示主机的信息，
-        包括主机名 (h_name)、主机别名列表 (h_aliases)、地址类型 (h_addrtype)、地址长度 (h_length) 以及主机地址列表 (h_addr_list)。
-        它常用于网络编程中，特别是在解析主机名和地址时。
+     *通过地址创建主机
+     *hostent 结构体用于表示主机的信息，
+     *包括主机名 (h_name)、主机别名列表 (h_aliases)、地址类型 (h_addrtype)、地址长度 (h_length) 以及主机地址列表 (h_addr_list)。
+     *它常用于网络编程中，特别是在解析主机名和地址时。
     */
     struct hostent *host = gethostbyname(hostname);
     if (!host) {
@@ -95,6 +95,7 @@ char *http_post_json(const char *hostname, int port, const char *endpoint, const
     }
     response[size] = '\0';
     closesocket(sock);
+
 #ifdef _WIN32
     WSACleanup();
 #endif

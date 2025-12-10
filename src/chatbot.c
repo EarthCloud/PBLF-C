@@ -43,6 +43,7 @@ void chatbot_run(Chatbot *bot) {
 
     char input[MAX_INPUT];
     while (bot->is_running) {
+        fflush(stdout);
         printf("[%s]> ", bot->current_user.username);
         if (!fgets(input, sizeof(input), stdin)) break;
         // 将换行符置为0
