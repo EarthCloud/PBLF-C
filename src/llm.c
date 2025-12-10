@@ -99,17 +99,17 @@ Intent llm_analyze_intent(LLMModel *model, const char *user_input) {
             "你是一个指令分类器。请分析用户输入，严格从以下类别中选择一个最匹配的意图：\\n"
             "【待办类】\\n"
             "- TODO_ADD: 添加待办/任务，动作性任务。如：'去买菜'、'提醒我跑步'。参数：任务内容。\\n"
-            "- TODO_LIST: 查询/列出待办。参数：搜索关键词(无则为空)。\\n"
+            "- TODO_LIST: 查询/列出待办。参数：没有参数。\\n"
             "- TODO_COMPLETE: 完成/勾选待办。参数：任务ID(必须是数字)。\\n"
             "- TODO_DELETE: 删除/移除待办。参数：任务ID(必须是数字)。\\n"
             "【备忘录类】\\n"
             "- MEMO_ADD: 新建备忘/笔记，静态记录/日记/想法。如：'心情不好'、'写个日记'。参数：标题。\\n"
-            "- MEMO_LIST: 列出备忘录。参数：搜索关键词。\\n"
+            "- MEMO_LIST: 列出备忘录。参数：无参数。\\n"
             "- MEMO_READ: 读取/查看备忘内容。参数：标题。\\n"
             "- MEMO_DELETE: 删除备忘录。参数：标题。\\n"
             "【联系人类】\\n"
             "- CONTACT_ADD: 添加联系人。如：'存下丁真的电话'、'记一下那个人的联系方式'。参数：姓名。\\n"
-            "- CONTACT_LIST: 查找/列出联系人。参数：姓名关键词。\\n"
+            "- CONTACT_LIST: 查找/列出联系人。参数：没有参数。\\n"
             "- CONTACT_DELETE: 删除联系人。参数：姓名。\\n"
             "【其他】\\n"
             "- GAME_START: 玩游戏。参数：游戏名(贪吃蛇/计算器/数独)。\\n"
@@ -124,7 +124,7 @@ Intent llm_analyze_intent(LLMModel *model, const char *user_input) {
             "'买牛奶' -> TODO_ADD|买牛奶\\n"
             "'做完第2个了' -> TODO_COMPLETE|2\\n"
             "'写个日记叫今天' -> MEMO_ADD|今天\\n"
-            "'查下王明的电话' -> CONTACT_LIST|王明\\n"
+            "'查下我都有谁的电话' -> CONTACT_LIST|\\n"
             "'我现在心情很不好，能安慰安慰我嘛' -> CHAT|我现在心情很不好，能安慰安慰我嘛\\n"
             "'你好' -> CHAT|你好\\n"
             "\\n"
@@ -189,7 +189,3 @@ char *llm_chat_generate(LLMModel *model, const char *user_input) {
     return clean_resp;
 }
 
-// int llm_extract_keywords(LLMModel *model, const char *text, char **keywords, int max_keywords) {
-//     // 此函数暂时保留，逻辑不变，根据需要可后续优化
-//     return 0;
-// }
