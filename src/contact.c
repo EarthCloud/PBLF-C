@@ -4,8 +4,8 @@
 #include <string.h>
 
 // 创建列表
-ContactList* contact_create() {
-    ContactList* list = (ContactList*)malloc(sizeof(ContactList));
+ContactList *contact_create() {
+    ContactList *list = (ContactList *) malloc(sizeof(ContactList));
     if (list) {
         list->head = NULL;
         list->count = 0;
@@ -15,7 +15,7 @@ ContactList* contact_create() {
 }
 
 // 销毁列表
-void contact_destroy(ContactList* list) {
+void contact_destroy(ContactList *list) {
     if (!list) return;
     Contact *current = list->head;
     while (current) {
@@ -27,10 +27,10 @@ void contact_destroy(ContactList* list) {
 }
 
 // 添加联系人
-int contact_add(ContactList* list, const char* name) {
+int contact_add(ContactList *list, const char *name) {
     if (!list) return -1;
 
-    Contact *new_contact = (Contact*)malloc(sizeof(Contact));
+    Contact *new_contact = (Contact *) malloc(sizeof(Contact));
     if (!new_contact) return -1;
 
     new_contact->id = list->next_id++;
@@ -64,7 +64,7 @@ int contact_add(ContactList* list, const char* name) {
 }
 
 // 删除联系人 (按姓名)
-int contact_delete(ContactList* list, const char* name) {
+int contact_delete(ContactList *list, const char *name) {
     if (!list || !list->head || !name) return 0;
 
     Contact *current = list->head;
@@ -89,7 +89,7 @@ int contact_delete(ContactList* list, const char* name) {
 }
 
 // 列表/搜索输出
-void contact_list_to_buffer(ContactList* list, char* output, int max_len, const char* filter) {
+void contact_list_to_buffer(ContactList *list, char *output, int max_len, const char *filter) {
     if (!list || list->count == 0) {
         snprintf(output, max_len, "联系人列表是空的。");
         return;
@@ -105,9 +105,8 @@ void contact_list_to_buffer(ContactList* list, char* output, int max_len, const 
         // 过滤逻辑: 匹配姓名或电话
         if (!filter || strlen(filter) == 0 ||
             strstr(current->name, filter) || strstr(current->phone, filter)) {
-
             snprintf(line, sizeof(line), "[ID:%d] %s - %s\n",
-                current->id, current->name, current->phone);
+                     current->id, current->name, current->phone);
 
             if (strlen(output) + strlen(line) < max_len) {
                 strcat(output, line);

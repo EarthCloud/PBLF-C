@@ -34,12 +34,12 @@ if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
             -g
             -finput-charset=UTF-8
     )
-endif()
+endif ()
 
 # 5. Windows 下网络编程必须链接 ws2_32 库
 if (WIN32)
     target_link_libraries(chatbot ws2_32)
-endif()
+endif ()
 
 # 6. (可选) 设置输出目录
 # 让编译出来的 chatbot.exe 直接生成在项目根目录，而不是深藏在 cmake-build-debug 里

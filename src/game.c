@@ -14,20 +14,18 @@
 #define MAX_STACK 50 // 栈最大容量
 #define N 9
 
-void play_games(){
+void play_games() {
     int a;
     printf("欢迎来到游戏合集！请选择您想玩的游戏：\n");
     printf("1. 贪吃蛇游戏\n");
     printf("2. 数独游戏\n");
     printf("请输入游戏编号（1-2）：");
     scanf("%d", &a);
-    if (a == 1){
+    if (a == 1) {
         game_snake();
-    }
-    else if (a == 2){
+    } else if (a == 2) {
         game_sudoku();
-    }
-    else{
+    } else {
         printf("无效的选择，请重新运行程序并选择正确的游戏编号。\n");
     }
 }
@@ -133,6 +131,7 @@ void game_sudoku() {
     }
     Sleep(10000);
 }
+
 void initStack(Stack *stack) {
     stack->top = -1;
 }
@@ -180,7 +179,7 @@ char popOp(Stack *stack) {
         printf("错误：表达式格式错误（栈空）！\n");
         exit(1);
     }
-    return (char)stack->data[stack->top--];
+    return (char) stack->data[stack->top--];
 }
 
 // 获取栈顶元素（运算符栈）
@@ -188,7 +187,7 @@ char getTopOp(Stack *stack) {
     if (isEmpty(stack)) {
         return '\0'; // 栈空返回空字符
     }
-    return (char)stack->data[stack->top];
+    return (char) stack->data[stack->top];
 }
 
 // 判断是否为运算符
@@ -228,8 +227,8 @@ double calculate(double num1, double num2, char op) {
 
 // 中缀表达式转后缀表达式（逆波兰式）并计算结果
 double evaluateExpression(char *expr) {
-    Stack opStack;    // 运算符栈
-    Stack numStack;   // 数值栈
+    Stack opStack; // 运算符栈
+    Stack numStack; // 数值栈
     initStack(&opStack);
     initStack(&numStack);
 
@@ -283,7 +282,8 @@ double evaluateExpression(char *expr) {
                 double res = calculate(num1, num2, op);
                 pushNum(&numStack, res);
             }
-            if (isEmpty(&opStack)) { // 未找到匹配的左括号
+            if (isEmpty(&opStack)) {
+                // 未找到匹配的左括号
                 printf("错误：括号不匹配（缺少左括号）！\n");
                 exit(1);
             }
@@ -314,7 +314,8 @@ double evaluateExpression(char *expr) {
     // 处理栈中剩余的运算符
     while (!isEmpty(&opStack)) {
         char op = popOp(&opStack);
-        if (op == '(') { // 未找到匹配的右括号
+        if (op == '(') {
+            // 未找到匹配的右括号
             printf("错误：括号不匹配（缺少右括号）！\n");
             exit(1);
         }
@@ -374,22 +375,26 @@ typedef struct {
 } Food;
 
 void gotoxy(int x, int y) {
-    COORD coord = { (SHORT)x, (SHORT)y };
+    COORD coord = {(SHORT) x, (SHORT) y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
 void draw_border() {
     for (int x = 0; x <= WIDTH; x++) {
-        gotoxy(x, 0); putchar('#');
-        gotoxy(x, HEIGHT); putchar('#');
+        gotoxy(x, 0);
+        putchar('#');
+        gotoxy(x, HEIGHT);
+        putchar('#');
     }
     for (int y = 0; y <= HEIGHT; y++) {
-        gotoxy(0, y); putchar('#');
-        gotoxy(WIDTH, y); putchar('#');
+        gotoxy(0, y);
+        putchar('#');
+        gotoxy(WIDTH, y);
+        putchar('#');
     }
 }
 
-void init_snake(Snake* snake) {
+void init_snake(Snake *snake) {
     snake->size = INIT_SNAKE_LEN;
     for (int i = 0; i < snake->size; i++) {
         snake->body[i].x = WIDTH / 2 - i;
@@ -399,7 +404,7 @@ void init_snake(Snake* snake) {
     snake->dy = 0;
 }
 
-void spawn_food(Food* food, Snake* snake) {
+void spawn_food(Food *food, Snake *snake) {
     int valid = 0;
     while (!valid) {
         food->pos.x = rand() % (WIDTH - 2) + 1;
@@ -414,26 +419,26 @@ void spawn_food(Food* food, Snake* snake) {
     }
 }
 
-void draw_snake(const Snake* snake) {
+void draw_snake(const Snake *snake) {
     for (int i = 0; i < snake->size; i++) {
         gotoxy(snake->body[i].x, snake->body[i].y);
         putchar(i == 0 ? '@' : 'o');
     }
 }
 
-void draw_food(const Food* food) {
+void draw_food(const Food *food) {
     gotoxy(food->pos.x, food->pos.y);
     putchar('$');
 }
 
-void clear_snake(const Snake* snake) {
+void clear_snake(const Snake *snake) {
     for (int i = 0; i < snake->size; i++) {
         gotoxy(snake->body[i].x, snake->body[i].y);
         putchar(' ');
     }
 }
 
-int check_collision(const Snake* snake) {
+int check_collision(const Snake *snake) {
     // 撞墙
     if (snake->body[0].x <= 0 || snake->body[0].x >= WIDTH ||
         snake->body[0].y <= 0 || snake->body[0].y >= HEIGHT)
@@ -447,7 +452,7 @@ int check_collision(const Snake* snake) {
     return 0;
 }
 
-void move_snake(Snake* snake) {
+void move_snake(Snake *snake) {
     for (int i = snake->size - 1; i > 0; i--)
         snake->body[i] = snake->body[i - 1];
     snake->body[0].x += snake->dx;
@@ -458,7 +463,7 @@ void game_snake() {
     Snake snake;
     Food food;
     int score = 0;
-    srand((unsigned)time(NULL));
+    srand((unsigned) time(NULL));
     system("cls");
     draw_border();
     init_snake(&snake);
@@ -470,11 +475,19 @@ void game_snake() {
         // 控制方向
         if (_kbhit()) {
             char ch = _getch();
-            if ((ch == 'w' || ch == 72) && snake.dy != 1) { snake.dx = 0; snake.dy = -1; }
-            else if ((ch == 's' || ch == 80) && snake.dy != -1) { snake.dx = 0; snake.dy = 1; }
-            else if ((ch == 'a' || ch == 75) && snake.dx != 1) { snake.dx = -1; snake.dy = 0; }
-            else if ((ch == 'd' || ch == 77) && snake.dx != -1) { snake.dx = 1; snake.dy = 0; }
-            else if (ch == 27) break; // ESC退出
+            if ((ch == 'w' || ch == 72) && snake.dy != 1) {
+                snake.dx = 0;
+                snake.dy = -1;
+            } else if ((ch == 's' || ch == 80) && snake.dy != -1) {
+                snake.dx = 0;
+                snake.dy = 1;
+            } else if ((ch == 'a' || ch == 75) && snake.dx != 1) {
+                snake.dx = -1;
+                snake.dy = 0;
+            } else if ((ch == 'd' || ch == 77) && snake.dx != -1) {
+                snake.dx = 1;
+                snake.dy = 0;
+            } else if (ch == 27) break; // ESC退出
         }
         clear_snake(&snake);
         move_snake(&snake);
@@ -507,18 +520,3 @@ void game_snake() {
     Sleep(2000);
     system("cls");
 }
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-

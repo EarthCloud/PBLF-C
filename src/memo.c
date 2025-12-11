@@ -33,15 +33,15 @@ void memo_save() {
     fclose(fp);
 }
 
-int memo_add(const char* title) {
+int memo_add(const char *title) {
     if (g_count >= MAX_MEMOS) return -1;
 
     Memo *m = &g_memos[g_count];
 
     // 生成 ID
     int max_id = 0;
-    for(int i=0; i<g_count; i++) {
-        if(g_memos[i].id > max_id) max_id = g_memos[i].id;
+    for (int i = 0; i < g_count; i++) {
+        if (g_memos[i].id > max_id) max_id = g_memos[i].id;
     }
     m->id = max_id + 1;
 
@@ -75,7 +75,7 @@ int memo_delete(int id) {
     if (index != -1) {
         // 移动数组填补空缺
         for (int i = index; i < g_count - 1; i++) {
-            g_memos[i] = g_memos[i+1];
+            g_memos[i] = g_memos[i + 1];
         }
         g_count--;
         memo_save();
@@ -84,17 +84,18 @@ int memo_delete(int id) {
     return 0;
 }
 
-int memo_delete_by_title(const char* title) {
+int memo_delete_by_title(const char *title) {
     // 简单的按标题删除，如果有重名只删第一个
     for (int i = 0; i < g_count; i++) {
-        if (strstr(title,g_memos[i].title ) != NULL) { // 支持模糊匹配
+        if (strstr(title, g_memos[i].title) != NULL) {
+            // 支持模糊匹配
             return memo_delete(g_memos[i].id);
         }
     }
     return 0;
 }
 
-void memo_list(char* output, int max_len) {
+void memo_list(char *output, int max_len) {
     if (g_count == 0) {
         snprintf(output, max_len, "备忘录是空的。");
         return;
@@ -114,7 +115,7 @@ void memo_list(char* output, int max_len) {
     }
 }
 
-void memo_search(const char* keyword, char* output, int max_len) {
+void memo_search(const char *keyword, char *output, int max_len) {
     output[0] = '\0';
     char line[256];
     int found = 0;
@@ -134,7 +135,7 @@ void memo_search(const char* keyword, char* output, int max_len) {
     }
 }
 
-void memo_read_by_title(const char* title, char* output, int max_len) {
+void memo_read_by_title(const char *title, char *output, int max_len) {
     for (int i = 0; i < g_count; i++) {
         if (strstr(g_memos[i].title, title) != NULL) {
             snprintf(output, max_len, "【%s】\n%s", g_memos[i].title, g_memos[i].content);

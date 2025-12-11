@@ -9,7 +9,9 @@ typedef struct {
 } Chatbot;
 
 int chatbot_init(Chatbot *bot);
+
 void chatbot_run(Chatbot *bot);
+
 char *chatbot_process_input(Chatbot *bot, const char *input);
 
 #endif

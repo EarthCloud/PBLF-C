@@ -142,7 +142,7 @@ Intent llm_analyze_intent(LLMModel *model, const char *user_input) {
     char content[1024] = {0};
     if (http_extract_json_string(response, "content", content, sizeof(content))) {
         // 使用鲁棒的解析逻辑
-        printf("[Debug] 原始解析内容：%s\n",content);
+        printf("[Debug] 原始解析内容：%s\n", content);
         int found = 0;
         for (int i = 0; INTENT_MAP[i].key != NULL; i++) {
             char *keyword_pos = strstr(content, INTENT_MAP[i].key);
@@ -192,4 +192,3 @@ char *llm_chat_generate(LLMModel *model, const char *user_input) {
     free(response);
     return clean_resp;
 }
-

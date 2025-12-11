@@ -17,10 +17,10 @@ typedef struct {
 void todo_init();
 
 // 添加待办 (如果 content 为空，则内部交互读取)
-int todo_add(const char* content);
+int todo_add(const char *content);
 
 // 列出待办 (结果写入 output)
-void todo_list(char* output, int max_len, const char* filter);
+void todo_list(char *output, int max_len, const char *filter);
 
 // 完成待办
 int todo_complete(int id);

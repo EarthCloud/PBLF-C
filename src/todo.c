@@ -11,15 +11,15 @@ void todo_init() {
     memset(g_todos, 0, sizeof(g_todos));
 }
 
-int todo_add(const char* content) {
+int todo_add(const char *content) {
     if (g_count >= MAX_TODOS) return -1;
 
     TodoItem *t = &g_todos[g_count];
 
     // 生成 ID (简单的自增逻辑)
     int max_id = 0;
-    for(int i=0; i<g_count; i++) {
-        if(g_todos[i].id > max_id) max_id = g_todos[i].id;
+    for (int i = 0; i < g_count; i++) {
+        if (g_todos[i].id > max_id) max_id = g_todos[i].id;
     }
     t->id = max_id + 1;
     t->is_completed = 0;
@@ -39,7 +39,7 @@ int todo_add(const char* content) {
     return t->id;
 }
 
-void todo_list(char* output, int max_len, const char* filter) {
+void todo_list(char *output, int max_len, const char *filter) {
     if (g_count == 0) {
         snprintf(output, max_len, "待办清单是空的。");
         return;
@@ -58,9 +58,9 @@ void todo_list(char* output, int max_len, const char* filter) {
         }
 
         snprintf(line, sizeof(line), "[%c] ID:%d %s\n",
-            g_todos[i].is_completed ? 'x' : ' ',
-            g_todos[i].id,
-            g_todos[i].content);
+                 g_todos[i].is_completed ? 'x' : ' ',
+                 g_todos[i].id,
+                 g_todos[i].content);
 
         if (strlen(output) + strlen(line) < max_len) {
             strcat(output, line);

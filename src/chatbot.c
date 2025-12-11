@@ -7,7 +7,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-
 #include "todo.h"
 
 // 全局实例
@@ -15,7 +14,7 @@ static LLMModel g_llm_model;
 static ContactList *g_contact_list = NULL;
 
 // 私有声明
-static void chatbot_auth_loop(Chatbot *bot);
+static void chatbot_auth_loop(Chatbot * bot);
 
 static void dispatch_intent(Chatbot *bot, Intent intent, char *resp);
 
@@ -26,7 +25,7 @@ int chatbot_init(Chatbot *bot) {
     printf("[System] 正在加载模块...\n");
 
     g_contact_list = contact_create();
-    if (!user_init()||!memo_init()||!g_contact_list) {
+    if (!user_init() || !memo_init() || !g_contact_list) {
         printf("模块加载失败！\n");
         return 0;
     }
@@ -87,7 +86,7 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
     char *param = intent.parameter;
 
     switch (intent.type) {
-        // --- 待办事项模块 (TODO) ---
+        // --- 待办事项模块 ---
         case INTENT_TODO_ADD: {
             int id = todo_add(param);
             if (id != -1) {
@@ -101,7 +100,6 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
             // 支持带参搜索
             todo_list(resp, MAX_RESPONSE, param);
             break;
-
         case INTENT_TODO_COMPLETE: {
             int id = atoi(param);
             if (id > 0 && todo_complete(id)) {
@@ -121,6 +119,7 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
             break;
         }
 
+        // --- 备忘录模块 ---
         case INTENT_MEMO_ADD: {
             // LLM 当前可能只提取了标题。
             // 需要多轮对话来获取内容
@@ -139,7 +138,6 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
                 memo_list(resp, MAX_RESPONSE); // 否则列出所有
             }
             break;
-
         case INTENT_MEMO_READ:
             memo_read_by_title(param, resp, MAX_RESPONSE);
             break;
@@ -151,7 +149,7 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
             }
             break;
 
-            // --- 联系人 (CONTACT)---
+        // --- 联系人模块---
         case INTENT_CONTACT_ADD: {
             // 参数 param 通常是姓名 (例如 "丁真")
             // 函数内部会交互式询问电话号码
@@ -167,7 +165,6 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
             // 支持按姓名或电话搜索
             contact_list_to_buffer(g_contact_list, resp, MAX_RESPONSE, param);
             break;
-
         case INTENT_CONTACT_DELETE:
             // 按姓名删除
             if (contact_delete(g_contact_list, param)) {
@@ -212,14 +209,16 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
 
 static void chatbot_auth_loop(Chatbot *bot) {
     // 简单模拟直接登录，方便调试
-    // 实际使用时请取消注释下方的交互逻辑
-    user_login("earthcloud", "123", &bot->current_user);
+    //user_login("earthcloud", "123", &bot->current_user);
 
-    /* char input[MAX_INPUT], cmd[20], u[50], p[50];
+    char input[MAX_INPUT], cmd[20], u[50], p[50];
     user_show_guide();
     while (bot->is_running) {
         printf("Auth> ");
-        if (!fgets(input, sizeof(input), stdin)) { bot->is_running = 0; return; }
+        if (!fgets(input, sizeof(input), stdin)) {
+            bot->is_running = 0;
+            return;
+        }
         if (sscanf(input, "%s %s %s", cmd, u, p) < 1) continue;
 
         if (strcmp(cmd, "login") == 0) {
@@ -232,5 +231,4 @@ static void chatbot_auth_loop(Chatbot *bot) {
             bot->is_running = 0;
         }
     }
-    */
 }

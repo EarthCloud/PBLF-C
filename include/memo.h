@@ -22,21 +22,21 @@ int memo_init();
 void memo_save();
 
 // 添加备忘 (返回新ID)
-int memo_add(const char* title);
+int memo_add(const char *title);
 
 // 删除备忘 (返回 1 成功, 0 失败)
 int memo_delete(int id);
 
 // 删除备忘 (根据标题删除，用于 LLM 传回标题的情况)
-int memo_delete_by_title(const char* title);
+int memo_delete_by_title(const char *title);
 
 // 获取列表字符串 (将结果写入 output 缓冲区)
-void memo_list(char* output, int max_len);
+void memo_list(char *output, int max_len);
 
 // 搜索备忘 (将结果写入 output)
-void memo_search(const char* keyword, char* output, int max_len);
+void memo_search(const char *keyword, char *output, int max_len);
 
 // 根据标题读取内容
-void memo_read_by_title(const char* title, char* output, int max_len);
+void memo_read_by_title(const char *title, char *output, int max_len);
 
 #endif

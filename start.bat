@@ -10,7 +10,7 @@ set "PORT=8080"
 set "MODEL_FILE=qwen2.5-1.5b-instruct-q4_k_m.gguf"
 :: ================= 启动 llamafile =================
 echo [System] 正在启动本地 AI 引擎 (llamafile)...
-echo [System] 模型: tools\model.gguf
+echo [System] 模型: tools\qwen2.5-1.5b-instruct-q4_k_m.gguf
 
 :: 启动参数说明：
 :: -m: 指定模型文件
@@ -18,10 +18,11 @@ echo [System] 模型: tools\model.gguf
 :: --nobrowser: 不自动打开浏览器
 :: --port: 指定端口
 :: >nul 2>&1: 隐藏后台输出
+
 start /B "" "%PROJECT_ROOT%\tools\llamafile.exe" -m "%PROJECT_ROOT%\tools\%MODEL_FILE%" --server --nobrowser --port %PORT% >nul 2>&1
 
-:: 等待预热 (llamafile 启动稍慢，多给点时间)
-echo [System] 等待引擎启动 (约 5-8 秒)...
+:: 等待预热
+echo [System] 等待llamafile引擎启动 (约 5-8 秒)...
 timeout /t 8 /nobreak >nul
 
 :: ================= 启动主程序 =================
