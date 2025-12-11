@@ -27,6 +27,7 @@ int chatbot_init(Chatbot *bot) {
         return 0;
     }
     todo_init();
+
     printf("[System] 正在连接到AI...\n");
     llm_init(&g_llm_model, "127.0.0.1", 8080);
 
