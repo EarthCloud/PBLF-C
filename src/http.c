@@ -35,8 +35,8 @@ char *http_post_json(const char *hostname, int port, const char *endpoint, const
     if (sock == INVALID_SOCKET) return NULL;
 
     /*
-     *通过地址创建主机
-     *hostent 结构体用于表示主机的信息，
+     *解析服务器地址 (DNS Resolution)
+     *hostent 结构体用于表示主机的信息
      *包括主机名 (h_name)、主机别名列表 (h_aliases)、地址类型 (h_addrtype)、地址长度 (h_length) 以及主机地址列表 (h_addr_list)。
      *它常用于网络编程中，特别是在解析主机名和地址时。
     */
@@ -46,7 +46,7 @@ char *http_post_json(const char *hostname, int port, const char *endpoint, const
         return NULL;
     }
 
-    // 设置IPV4地址
+    // 设置设置连接目标 (Addressing)
     struct sockaddr_in server_addr = {0};
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);

@@ -2,6 +2,7 @@
 #include "user.h"
 #include "llm.h"
 #include "game.h"
+#include "memo.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,8 +20,8 @@ int chatbot_init(Chatbot *bot) {
     if (!bot) return 0;
 
     printf("[System] 正在加载模块...\n");
-    if (!user_init()) {
-        printf("[Error] 用户模块加载失败\n");
+    if (!user_init()||!memo_init()) {
+        printf("模块加载失败！\n");
         return 0;
     }
 
@@ -97,19 +98,34 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
             // todo_delete(&g_todo_list, atoi(param));
             break;
 
-        // --- 备忘录模块 ---
-        case INTENT_MEMO_ADD:
-            sprintf(resp, "[MEMO] 新建备忘录，标题: %s\n请在下一行输入内容(模拟)...", param);
-            // memo_add(...)
+        case INTENT_MEMO_ADD: {
+            // LLM 当前可能只提取了标题。
+            // 需要多轮对话来获取内容
+            int id = memo_add(param);
+            if (id != -1) {
+                sprintf(resp, "已新建备忘录 [ID:%d]\n标题: %s", id, param);
+            } else {
+                sprintf(resp, "备忘录已满，无法添加！");
+            }
             break;
+        }
         case INTENT_MEMO_LIST:
-            sprintf(resp, "[MEMO] 查找备忘录: %s", param);
+            if (strlen(param) > 0) {
+                memo_search(param, resp, MAX_RESPONSE); // 如果有参数则搜索
+            } else {
+                memo_list(resp, MAX_RESPONSE); // 否则列出所有
+            }
             break;
+
         case INTENT_MEMO_READ:
-            sprintf(resp, "[MEMO] 读取备忘录内容: %s", param);
+            memo_read_by_title(param, resp, MAX_RESPONSE);
             break;
         case INTENT_MEMO_DELETE:
-            sprintf(resp, "[MEMO] 删除备忘录: %s", param);
+            if (memo_delete_by_title(param)) {
+                sprintf(resp, "已删除标题为 '%s' 的备忘录。", param);
+            } else {
+                sprintf(resp, "未找到标题为 '%s' 的备忘录，删除失败。", param);
+            }
             break;
 
         // --- 联系人模块 ---
@@ -125,8 +141,20 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
 
         // --- 游戏模块 ---
         case INTENT_GAME_START:
-            play_games();
-            printf("感谢游玩，下次再来哦！\n");
+            printf("正在启动游戏...\n");
+            // 注意：游戏通常需要接管控制台，所以可能不适合通过 resp 返回
+            // 这里直接调用 game_snake() 然后 return 一个结束语
+            if (strstr(param, "snake") || strstr(param, "贪吃蛇")) {
+                game_snake();
+                sprintf(resp, "贪吃蛇游戏结束。");
+            } else if (strstr(param, "sudoku") || strstr(param, "数独")) {
+                game_sudoku();
+                sprintf(resp, "数独游戏结束。");
+            } else {
+                // 如果没匹配到，打开菜单
+                play_games();
+                sprintf(resp, "游戏选单已关闭。");
+            }
             break;
 
         // --- 闲聊与系统 ---
