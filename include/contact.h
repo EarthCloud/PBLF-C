@@ -1,51 +1,39 @@
+#ifndef CONTACT_H
 #define CONTACT_H
 
-#include<stdbool.h>
+#include "common.h"
 
-#define MAX_NAME_LEN 50
-#define MAX_PHONE_LEN 25
-#define MAX_EMAIL_LEN 100
+#define CONTACT_NAME_LEN 50
+#define CONTACT_PHONE_LEN 20
 
-// 联系人信息结构
-typedef struct{
+// 联系人节点 (链表结构)
+typedef struct Contact {
     int id;
-    char name[MAX_NAME_LEN];
-    char phone[MAX_PHONE_LEN];
-    char email[MAX_EMAIL_LEN];
-}Contactinfo;
+    char name[CONTACT_NAME_LEN];
+    char phone[CONTACT_PHONE_LEN];
+    struct Contact *next;
+} Contact;
 
-// 链表节点
-typedef struct ContactNode{
-    Contactinfo data;
-    struct ContatNode*next;
-}ContactNode;
+// 联系人列表管理器
+typedef struct {
+    Contact *head;
+    int count;
+    int next_id;
+} ContactList;
 
-// 初始化链表与销毁链表
-bool init_list(ContactNode **L);
-void destroy_list(ContactNode **L);
+// 初始化/创建列表
+ContactList* contact_create();
 
-// 联系人管理
-int add_contact(ContactNode *L, const char *name, const char *phone, const char *email);
-bool delete_contact(ContactNode *L, int id);
-bool update_contact(ContactNode *L, int id, const char *name, const char *phone, const char *email);
+// 销毁列表
+void contact_destroy(ContactList* list);
 
-// 查找功能
-ContactNode* search_by_id(ContactNode *L, int id);
-ContactNode* search_by_name(ContactNode *L, const char *name);
-ContactNode* search_by_phone(ContactNode *L, const char *phone);
+// 添加联系人 (交互式：如果 name 为空则询问，phone 总是询问)
+int contact_add(ContactList* list, const char* name);
 
-// 显示功能
-void display_one(ContactNode *node);
-void display_all(ContactNode *L);
+// 删除联系人 (按姓名)
+int contact_delete(ContactList* list, const char* name);
 
-// 文件保存与加载
-bool save_to_file(ContactNode *L, const char *filename);
-bool load_from_file(ContactNode **L, const char *filename);
+// 搜索/列出联系人 (结果写入 output 缓冲区)
+void contact_list_to_buffer(ContactList* list, char* output, int max_len, const char* filter);
 
-// 统计联系人数量
-int get_contact_count(ContactNode *L);
-
-
-
-
-
+#endif

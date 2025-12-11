@@ -3,6 +3,7 @@
 #include "llm.h"
 #include "game.h"
 #include "memo.h"
+#include "contact.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,6 +12,7 @@
 
 // 全局实例
 static LLMModel g_llm_model;
+static ContactList *g_contact_list = NULL;
 
 // 私有声明
 static void chatbot_auth_loop(Chatbot *bot);
@@ -22,7 +24,9 @@ int chatbot_init(Chatbot *bot) {
     if (!bot) return 0;
 
     printf("[System] 正在加载模块...\n");
-    if (!user_init()||!memo_init()) {
+
+    g_contact_list = contact_create();
+    if (!user_init()||!memo_init()||!g_contact_list) {
         printf("模块加载失败！\n");
         return 0;
     }
@@ -147,15 +151,30 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
             }
             break;
 
-        // --- 联系人模块 ---
-        case INTENT_CONTACT_ADD:
-            sprintf(resp, "[CONTACT] 新建联系人: %s", param);
+            // --- 联系人 (CONTACT)---
+        case INTENT_CONTACT_ADD: {
+            // 参数 param 通常是姓名 (例如 "丁真")
+            // 函数内部会交互式询问电话号码
+            int id = contact_add(g_contact_list, param);
+            if (id != -1) {
+                sprintf(resp, "已保存联系人: %s", param[0] ? param : "(新联系人)");
+            } else {
+                sprintf(resp, "保存联系人失败。");
+            }
             break;
+        }
         case INTENT_CONTACT_LIST:
-            sprintf(resp, "[CONTACT] 搜索联系人: %s", param);
+            // 支持按姓名或电话搜索
+            contact_list_to_buffer(g_contact_list, resp, MAX_RESPONSE, param);
             break;
+
         case INTENT_CONTACT_DELETE:
-            sprintf(resp, "[CONTACT] 删除联系人: %s", param);
+            // 按姓名删除
+            if (contact_delete(g_contact_list, param)) {
+                sprintf(resp, "已删除联系人: %s", param);
+            } else {
+                sprintf(resp, "未找到联系人: %s", param);
+            }
             break;
 
         // --- 游戏模块 ---

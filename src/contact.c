@@ -1,192 +1,123 @@
+#include "contact.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "contact.h"
 
-static int next_id=1;
-
-// 初始化链表
-bool init_list(ContactNode **L) {
-    if (L == NULL) {
-        return false;
+// 创建列表
+ContactList* contact_create() {
+    ContactList* list = (ContactList*)malloc(sizeof(ContactList));
+    if (list) {
+        list->head = NULL;
+        list->count = 0;
+        list->next_id = 1;
     }
-    *L = (ContactNode*)malloc(sizeof(ContactNode));
-    if (*L == NULL) {
-        return false;
-    }
-        (*L)->next = NULL;
-        return true;
+    return list;
 }
 
-// 销毁链表
-void destroy_list(ContactNode **L) {
-    if(L==NULL||*L==NULL){
-        return;
+// 销毁列表
+void contact_destroy(ContactList* list) {
+    if (!list) return;
+    Contact *current = list->head;
+    while (current) {
+        Contact *next = current->next;
+        free(current);
+        current = next;
     }
-    ContactNode *curr = *L;
-    ContactNode *next = NULL;
-    while (curr != NULL) {
-        next=curr->next;
-        free(curr);
-        curr=next;
-    }
-    *L = NULL;
+    free(list);
 }
 
 // 添加联系人
-int add_contact(ContactNode *L, const char *name, const char *phone, const char *email) {
-    if (L == NULL) return 0;
-    
-    ContactNode *new_node = (ContactNode*)malloc(sizeof(ContactNode));
-    if (new_node == NULL) return 0;
-    
-    new_node->data.id = next_id++;
-    strncpy(new_node->data.name, name, MAX_NAME_LEN - 1);
-    strncpy(new_node->data.phone, phone, MAX_PHONE_LEN - 1);
-    strncpy(new_node->data.email, email, MAX_EMAIL_LEN - 1);
-    new_node->data.name[MAX_NAME_LEN - 1] = '\0';
-    new_node->data.phone[MAX_PHONE_LEN - 1] = '\0';
-    new_node->data.email[MAX_EMAIL_LEN - 1] = '\0';
-    
-    new_node->next = L->next;
-    L->next = new_node;
-    return new_node->data.id;
-}
+int contact_add(ContactList* list, const char* name) {
+    if (!list) return -1;
 
-// 删除联系人
-bool delete_contact(ContactNode *L, int id) {
-    if (L == NULL || L->next == NULL) return false;
-    
-    ContactNode *prev = L, *curr = L->next;
-    while (curr != NULL) {
-        if (curr->data.id == id) {
-            prev->next = curr->next;
-            free(curr);
-            return true;
+    Contact *new_contact = (Contact*)malloc(sizeof(Contact));
+    if (!new_contact) return -1;
+
+    new_contact->id = list->next_id++;
+
+    // 1. 处理姓名
+    if (name && strlen(name) > 0) {
+        strncpy(new_contact->name, name, CONTACT_NAME_LEN - 1);
+    } else {
+        printf(">> 请输入联系人姓名: ");
+        if (fgets(new_contact->name, CONTACT_NAME_LEN, stdin)) {
+            new_contact->name[strcspn(new_contact->name, "\n")] = 0;
         }
-        prev = curr;
-        curr = curr->next;
     }
-    return false;
-}
+    new_contact->name[CONTACT_NAME_LEN - 1] = '\0';
 
-// 修改联系人
-bool update_contact(ContactNode *L, int id, const char *name, const char *phone, const char *email) {
-    ContactNode *node = search_by_id(L, id);
-    if (node == NULL) return false;
-    
-    if (name != NULL) strncpy(node->data.name, name, MAX_NAME_LEN - 1);
-    if (phone != NULL) strncpy(node->data.phone, phone, MAX_PHONE_LEN - 1);
-    if (email != NULL) strncpy(node->data.email, email, MAX_EMAIL_LEN - 1);
-    return true;
-}
-
-// 按ID查找
-ContactNode* search_by_id(ContactNode *L, int id) {
-    if (L == NULL) return NULL;
-    ContactNode *curr = L->next;
-    while (curr != NULL) {
-        if (curr->data.id == id) return curr;
-        curr = curr->next;
+    // 2. 处理电话 (总是交互式询问，因为 LLM 很难一次性提取两个参数)
+    printf(">> 请输入 [%s] 的电话: ", new_contact->name);
+    if (fgets(new_contact->phone, CONTACT_PHONE_LEN, stdin)) {
+        new_contact->phone[strcspn(new_contact->phone, "\n")] = 0;
+    } else {
+        new_contact->phone[0] = '\0';
     }
-    return NULL;
+
+    // 3. 插入链表 (头插法简单点，或者尾插法)
+    // 这里用头插法
+    new_contact->next = list->head;
+    list->head = new_contact;
+    list->count++;
+
+    return new_contact->id;
 }
 
-// 按姓名查找
-ContactNode* search_by_name(ContactNode *L, const char *name) {
-    if (L == NULL) return NULL;
-    ContactNode *curr = L->next;
-    while (curr != NULL) {
-        if (strcmp(curr->data.name, name) == 0) return curr;
-        curr = curr->next;
+// 删除联系人 (按姓名)
+int contact_delete(ContactList* list, const char* name) {
+    if (!list || !list->head || !name) return 0;
+
+    Contact *current = list->head;
+    Contact *prev = NULL;
+
+    while (current) {
+        // 支持模糊匹配删除
+        if (strstr(current->name, name) != NULL) {
+            if (prev == NULL) {
+                list->head = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            free(current);
+            list->count--;
+            return 1;
+        }
+        prev = current;
+        current = current->next;
     }
-    return NULL;
+    return 0;
 }
 
-// 按电话查找
-ContactNode* search_by_phone(ContactNode *L, const char *phone) {
-    if (L == NULL) return NULL;
-    ContactNode *curr = L->next;
-    while (curr != NULL) {
-        if (strcmp(curr->data.phone, phone) == 0) return curr;
-        curr = curr->next;
-    }
-    return NULL;
-}
-
-// 显示单个联系人
-void display_one(ContactNode *node) {
-    if (node == NULL) return;
-    printf("ID: %d, 姓名: %s, 电话: %s, 邮箱: %s\n",
-           node->data.id, node->data.name, node->data.phone, node->data.email);
-}
-
-// 显示所有联系人
-void display_all(ContactNode *L) {
-    if (L == NULL || L->next == NULL) {
-        printf("通讯录为空\n");
+// 列表/搜索输出
+void contact_list_to_buffer(ContactList* list, char* output, int max_len, const char* filter) {
+    if (!list || list->count == 0) {
+        snprintf(output, max_len, "联系人列表是空的。");
         return;
     }
-    ContactNode *curr = L->next;
-    while (curr != NULL) {
-        display_one(curr);
-        curr = curr->next;
-    }
-}
 
-// 保存到文件
-bool save_to_file(ContactNode *L, const char *filename) {
-    if (L == NULL) return false;
-    FILE *fp = fopen(filename, "w");
-    if (fp == NULL) return false;
-    
-    ContactNode *curr = L->next;
-    while (curr != NULL) {
-        fprintf(fp, "%d,%s,%s,%s\n",
-                curr->data.id, curr->data.name, curr->data.phone, curr->data.email);
-        curr = curr->next;
-    }
-    fclose(fp);
-    return true;
-}
+    output[0] = '\0';
+    char line[128];
+    strncat(output, "=== 联系人列表 ===\n", max_len - 1);
 
-// 从文件加载
-bool load_from_file(ContactNode **L, const char *filename) {
-    FILE *fp = fopen(filename, "r");
-    if (fp == NULL) return false;
-    
-    destroy_list(L);
-    init_list(L);
- 
-    Contactinfo info;
-    while (fscanf(fp, "%d,%49[^,],%24[^,],%99[^\n]\n",&info.id, info.name, info.phone, info.email) == 4) 
-    {
-        ContactNode *new_node = (ContactNode*)malloc(sizeof(ContactNode));
-        if (new_node==NULL){
-            fclose(fp);
-            return false;
+    int found = 0;
+    Contact *current = list->head;
+    while (current) {
+        // 过滤逻辑: 匹配姓名或电话
+        if (!filter || strlen(filter) == 0 ||
+            strstr(current->name, filter) || strstr(current->phone, filter)) {
+
+            snprintf(line, sizeof(line), "[ID:%d] %s - %s\n",
+                current->id, current->name, current->phone);
+
+            if (strlen(output) + strlen(line) < max_len) {
+                strcat(output, line);
+                found++;
+            }
         }
-        new_node->data = info;
-        new_node->next = (*L)->next;
-        (*L)->next = new_node;
-        if (info.id>=next_id) {next_id=info.id+1;
-        
-        }
+        current = current->next;
     }
-    fclose(fp);
-    return true;
-}
 
-// 获取联系人数量  
-int get_contact_count(ContactNode*L){
-    int count=0;
-    if(L!=NULL){
-        ContactNode*curr=L->next;
-        while (curr!=NULL){
-            count++;
-            curr=curr->next;
-        }
+    if (found == 0 && filter) {
+        snprintf(output, max_len, "未找到匹配 '%s' 的联系人。", filter);
     }
-    return count;
 }
-
