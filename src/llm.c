@@ -11,7 +11,7 @@ typedef struct {
     IntentType type;
 } IntentMapping;
 
-// [重构] 完整的意图映射
+// 完整的意图映射
 static const IntentMapping INTENT_MAP[] = {
     // TODO
     {"TODO_ADD", INTENT_TODO_ADD},
@@ -126,6 +126,8 @@ Intent llm_analyze_intent(LLMModel *model, const char *user_input) {
             "'写个日记叫今天' -> MEMO_ADD|今天\\n"
             "'查下我都有谁的电话' -> CONTACT_LIST|\\n"
             "'删除标题为心情的备忘录' -> MEMO_DELETE|心情\\n"
+            "'我完成了ID为1的待办' -> TODO_COMPLETE|1\\n"
+            "'给我删除ID为1的待办' -> TODO_DELETE|1\\n"
             "'我现在心情很不好，能安慰安慰我嘛' -> CHAT|我现在心情很不好，能安慰安慰我嘛\\n"
             "'我想玩点小游戏' -> GAME_START|\\n"
             "'你好' -> CHAT|你好\\n"

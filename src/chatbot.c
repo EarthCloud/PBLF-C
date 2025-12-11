@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "todo.h"
+
 // 全局实例
 static LLMModel g_llm_model;
 
@@ -24,7 +26,7 @@ int chatbot_init(Chatbot *bot) {
         printf("模块加载失败！\n");
         return 0;
     }
-
+    todo_init();
     printf("[System] 正在连接到AI...\n");
     llm_init(&g_llm_model, "127.0.0.1", 8080);
 
@@ -80,23 +82,39 @@ static void dispatch_intent(Chatbot *bot, Intent intent, char *resp) {
     char *param = intent.parameter;
 
     switch (intent.type) {
-        // --- 待办事项模块 ---
-        case INTENT_TODO_ADD:
-            sprintf(resp, "[TODO] 执行添加待办: %s", param);
-            // todo_add(&g_todo_list, param);
+        // --- 待办事项模块 (TODO) ---
+        case INTENT_TODO_ADD: {
+            int id = todo_add(param);
+            if (id != -1) {
+                sprintf(resp, "已添加待办 [ID:%d] %s", id, param[0] ? param : "(新输入)");
+            } else {
+                sprintf(resp, "添加失败，清单已满。");
+            }
             break;
+        }
         case INTENT_TODO_LIST:
-            sprintf(resp, "[TODO] 执行列出待办，过滤词: %s", param);
-            // todo_list(&g_todo_list, param);
+            // 支持带参搜索
+            todo_list(resp, MAX_RESPONSE, param);
             break;
-        case INTENT_TODO_COMPLETE:
-            sprintf(resp, "[TODO] 执行完成待办 ID: %s", param);
-            // todo_complete(&g_todo_list, atoi(param));
+
+        case INTENT_TODO_COMPLETE: {
+            int id = atoi(param);
+            if (id > 0 && todo_complete(id)) {
+                sprintf(resp, "待办 [ID:%d] 已标记完成。", id);
+            } else {
+                sprintf(resp, "未找到待办 ID: %s", param);
+            }
             break;
-        case INTENT_TODO_DELETE:
-            sprintf(resp, "[TODO] 执行删除待办 ID: %s", param);
-            // todo_delete(&g_todo_list, atoi(param));
+        }
+        case INTENT_TODO_DELETE: {
+            int id = atoi(param);
+            if (id > 0 && todo_delete(id)) {
+                sprintf(resp, "待办 [ID:%d] 已删除。", id);
+            } else {
+                sprintf(resp, "删除失败，ID 无效: %s", param);
+            }
             break;
+        }
 
         case INTENT_MEMO_ADD: {
             // LLM 当前可能只提取了标题。
