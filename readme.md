@@ -9,7 +9,7 @@
 * **智能层 (`src/llm.c`)**：通过 Prompt Engineering 将非结构化自然语言转化为结构化指令（Intent & Parameter）。
 * **网络层 (`src/http.c`)**：纯手写的 HTTP/1.1 客户端，直接基于 Socket API 实现，零第三方依赖。
 * **功能层**：
-    * **游戏模块 (`src/game.c`)**：包含贪吃蛇、数独求解器、表达式计算器。
+    * **游戏模块 (`src/game.c`)**：包含贪吃蛇、数独求解器。
     * **数据管理**：待办 (`todo`)、备忘 (`memo`)、联系人 (`contact`)。
 
 ## 3. 技术亮点与优势
